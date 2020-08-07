@@ -1,0 +1,21 @@
+15:19:46 INFO - hello world
+15:21:40 INFO - hello world
+15:21:52 INFO - hello world
+15:22:41 INFO - hello world
+15:24:14 INFO - +/test
+15:24:34 INFO - /test
+15:27:12 ERROR - //test
+15:27:32 ERROR - /test
+15:28:13 ERROR - /test - error message
+15:31:23 INFO - /test - error message
+15:31:40 INFO - /test - error message
+15:31:49 INFO - /test - error message
+15:32:23 INFO - /test - error message
+15:33:17 INFO - /test - error message
+15:42:43 INFO - /test - error message
+15:43:05 INFO - /app/test - error message
+15:43:16 INFO - /app/test - error message
+15:43:17 INFO - /app/test - error message
+15:43:36 INFO - /test - error message
+15:43:49 INFO - /test - error message
+15:43:50 INFO - /test - error message
