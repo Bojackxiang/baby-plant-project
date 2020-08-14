@@ -1,24 +1,49 @@
-const { graphqlHTTP } = require('express-graphql');
-const { buildSchema } = require('graphql');
+const { graphqlHTTP } = require("express-graphql");
+const { buildASTSchema } = require("graphql");
+const gql = require('graphql-tag');
+const {MongoDriver} = require('../db/index')
 
-const graphQLSchema = buildSchema(`
-    type Query {
-        hello: String
+
+const graphQLSchema = buildASTSchema(gql`
+    type UserTestFeetBack {
+        name: String
+        age: Int
     }
-`)
+
+    type Query {
+        hello: UserTestFeetBack 
+        testQuery: String 
+    }
+`);
 
 const graphQLRoot = {
-    hello: () => {
-        return 'Hello world'
+    hello: async () => {
+        try {
+            return {
+                name: 'user name',
+                age: 12, 
+            }
+        } catch (error) {
+            console.log('FAIL TO FETCH THE hello() ❌');
+            console.log(error.message);
+        }
+        
+    },
+
+    testQuery: async () => {
+        const db = new MongoDriver();
+        const result = db.findOne();
+        console.log(result);
+        return "hello"
     }
-}
+};
 
 const graphConfig = graphqlHTTP({
-    schema: graphQLSchema, 
+    schema: graphQLSchema,
     rootValue: graphQLRoot,
-    graphiql: true
-})
+    graphiql: true,
+});
 
 module.exports = {
-    graphConfig
-}
+    graphConfig,
+};

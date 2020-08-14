@@ -1,11 +1,14 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const {graphConfig} = require('./graph/schema')
-require('dotenv').config()
+const { graphConfig } = require("./graph/schema");
+const  connectionTest  = require("./db/connect");
+require("dotenv").config();
 
-app.use('/', require('./routes/routes')) 
-app.use('/graphql', graphConfig);
+connectionTest();
+
+app.use("/", require("./routes/routes"));
+app.use("/graphql", graphConfig);
 
 app.listen(process.env.PORT, () => {
-    console.log('Started listening 🚀');
-})
+    console.log("Started listening 🚀");
+});
