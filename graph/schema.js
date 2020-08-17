@@ -1,20 +1,20 @@
-const merge = require("lodash/merge");
-// user graphql query
-const { UserResolver, UserSchema } = require("./User/user.graph");
-// graphql
+/**
+ * Description:
+ *      Every time when create schema or resolvers, add them here to the list
+ */
+// graphql tools
 const { graphqlHTTP } = require("express-graphql");
 const { mergeSchemas, mergeResolvers } = require("graphql-tools");
-// todo: figure out how to use the merge resolvers
+// user graphql query
+const { UserResolver, UserSchema } = require("./User/user.graph");
 
-
+// merge schemas and resolvers
 const mergedSchemas = mergeSchemas({
     schemas: [UserSchema],
-})
+});
+const mergedResolvers = mergeResolvers([UserResolver]);
 
-const mergedResolvers = mergeResolvers(
-    [UserResolver]
-)
-
+// graphql config
 const graphConfig = graphqlHTTP({
     schema: mergedSchemas,
     rootValue: mergedResolvers,

@@ -9,6 +9,7 @@ const UserSchema = makeExecutableSchema({
             password: String
             type: String
         }
+        
         type Query {
             getUsers: [User]
         }
