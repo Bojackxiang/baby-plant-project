@@ -1,46 +1,23 @@
+const merge = require("lodash/merge");
+// user graphql query
+const { UserResolver, UserSchema } = require("./User/user.graph");
+// graphql
 const { graphqlHTTP } = require("express-graphql");
-const { buildASTSchema } = require("graphql");
-const gql = require('graphql-tag');
-const {MongoDriver} = require('../db/index')
+const { mergeSchemas, mergeResolvers } = require("graphql-tools");
+// todo: figure out how to use the merge resolvers
 
 
-const graphQLSchema = buildASTSchema(gql`
-    type UserTestFeetBack {
-        name: String
-        age: Int
-    }
+const mergedSchemas = mergeSchemas({
+    schemas: [UserSchema],
+})
 
-    type Query {
-        hello: UserTestFeetBack 
-        testQuery: String 
-    }
-`);
-
-const graphQLRoot = {
-    hello: async () => {
-        try {
-            return {
-                name: 'user name',
-                age: 12, 
-            }
-        } catch (error) {
-            console.log('FAIL TO FETCH THE hello() ❌');
-            console.log(error.message);
-        }
-        
-    },
-
-    testQuery: async () => {
-        const db = new MongoDriver();
-        const result = db.findOne();
-        console.log(result);
-        return "hello"
-    }
-};
+const mergedResolvers = mergeResolvers(
+    [UserResolver]
+)
 
 const graphConfig = graphqlHTTP({
-    schema: graphQLSchema,
-    rootValue: graphQLRoot,
+    schema: mergedSchemas,
+    rootValue: mergedResolvers,
     graphiql: true,
 });
 

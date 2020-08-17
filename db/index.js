@@ -10,7 +10,7 @@ class MongoDriver {
             return db;
         } catch (error) {
             console.log("FAIL TO COLLECT THE RIGHT DB ... ❌");
-            console.log(error.message);
+            console.log(error);
             return null;
         }
     }
@@ -23,6 +23,17 @@ class MongoDriver {
             return userCount;
         } catch (error) {
             console.log("FAIL TO COLLECT RIGHT DATA ... ❌");
+            console.log(error.message);
+        }
+    }
+
+    async getUsers() {
+        try {
+            const db = await this.dbConnection();
+            const userList = await db.collection("users").find().toArray();
+            return userList;
+        } catch (error) {
+            console.log('FAIL TO COLLECT USER LIST ... ❌');
             console.log(error.message);
         }
     }
