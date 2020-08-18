@@ -10,7 +10,7 @@ const { UserResolver, UserSchema } = require("./User/user.graph");
 
 // merge schemas and resolvers
 const mergedSchemas = mergeSchemas({
-    schemas: [UserSchema],
+    schemas: [UserSchema,],
 });
 const mergedResolvers = mergeResolvers([UserResolver]);
 
