@@ -7,13 +7,22 @@ log4js.configure({
         filename: 'logger/app.log',
         layout: {
           type: 'pattern',
-          pattern: '%r %p - %m',
+          // pattern: '%d %r %p - %m',
+          pattern: '[%d{yyyy/MM/dd hh:mm:ss}] %p - %m',
         }
       },
+      error: {
+        type: 'file',
+        filename: 'logger/error.log',
+        layout: {
+          type: 'pattern',
+          pattern: '%r %p - %m',
+        }
+      }
     },
     categories: {
       default: {
-        appenders: ['file',],
+        appenders: ['file', 'error'],
         level: 'debug'
       }
     }
