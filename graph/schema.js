@@ -4,20 +4,16 @@
  */
 // graphql tools
 const { graphqlHTTP } = require("express-graphql");
-const { mergeSchemas, mergeResolvers } = require("graphql-tools");
 // user graphql query
-const { UserResolver, UserSchema } = require("./User/user.graph");
+const { UserQL } = require("./User/user.graph");
+const { mergeSchemas } = require("graphql-tools");
 
 // merge schemas and resolvers
-const mergedSchemas = mergeSchemas({
-    schemas: [UserSchema,],
-});
-const mergedResolvers = mergeResolvers([UserResolver]);
+const mergedSchema = mergeSchemas({ schemas: [UserQL] });
 
 // graphql config
 const graphConfig = graphqlHTTP({
-    schema: mergedSchemas,
-    rootValue: mergedResolvers,
+    schema: mergedSchema,
     graphiql: true,
 });
 
