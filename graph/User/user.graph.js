@@ -2,9 +2,9 @@ const { MongoDriver } = require("../../db/index");
 const { gql } = require("apollo-server");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
 const { getRedisValueByName } = require("../../redis/utils");
+const generateUserWebTokenByAccount = require("../../utils/generaleUserWebToken");
 
 const UserSchema = gql`
-    # Response Status type
     enum UserResponseType {
         SUCCESS
         FAIL
@@ -15,6 +15,7 @@ const UserSchema = gql`
     type UserResponse {
         status: UserResponseType
         message: String
+        code: Int
     }
 
     type TypeA {
@@ -32,6 +33,11 @@ const UserSchema = gql`
         type: String
     }
 
+    input UserLoginInput {
+        username: String
+        password: String
+    }
+
     type Query {
         getUsers: [User]
         test: ResultType
@@ -39,7 +45,7 @@ const UserSchema = gql`
     }
 
     type Mutation {
-        userLogin: UserResponse
+        userLogin(userInput: UserLoginInput): UserResponse
     }
 `;
 
@@ -56,31 +62,34 @@ const UserResolvers = {
             const result = await db.getUsers();
             return result;
         },
-
-        test: async () => {
-            return {
-                name: "the name",
-            };
-        },
-
-        redisString: async () => {
-            try {
-                const value = await getRedisValueByName("USERNAME");
-                return {
-                    name: value,
-                };
-            } catch (error) {
-                console.log(error);
-            }
-        },
     },
 
     Mutation: {
-        userLogin: async () => {
-            return {
-                status: "SUCCESS",
-                message: "hello world",
-            };
+        userLogin: async (parent, { userInput: { username, password } }) => {
+            try {
+                // 如果在 redis 里面能找到user
+                const foundUser = await getRedisValueByName(username);
+                if (foundUser)
+                    return {
+                        status: "SUCCESS",
+                        message: "",
+                        code: 1,
+                    };
+
+                // 如果在redis里面没有找到user
+                const token = await generateUserWebTokenByAccount(
+                    username,
+                    password
+                );
+
+                return {
+                    status: "SUCCESS",
+                    message: token,
+                    code: 1,
+                };
+            } catch (error) {
+                console.log(error.message);
+            }
         },
     },
 };
