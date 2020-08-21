@@ -1,6 +1,7 @@
 const { MongoDriver } = require("../../db/index");
 const { gql } = require("apollo-server");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
+const { getRedisValueByName } = require("../../redis/utils");
 
 const UserSchema = gql`
     # Response Status type
@@ -34,6 +35,7 @@ const UserSchema = gql`
     type Query {
         getUsers: [User]
         test: ResultType
+        redisString: TypeA
     }
 
     type Mutation {
@@ -43,10 +45,10 @@ const UserSchema = gql`
 
 const UserResolvers = {
     ResultType: {
-        __resolveType(){
-            return "TypeA"
-        }
-    }, 
+        __resolveType() {
+            return "TypeA";
+        },
+    },
     Query: {
         getUsers: async () => {
             console.log("get user was triggered");
@@ -57,9 +59,20 @@ const UserResolvers = {
 
         test: async () => {
             return {
-                name: 'hello world'
+                name: "the name",
+            };
+        },
+
+        redisString: async () => {
+            try {
+                const value = await getRedisValueByName("USERNAME");
+                return {
+                    name: value,
+                };
+            } catch (error) {
+                console.log(error);
             }
-        }
+        },
     },
 
     Mutation: {
@@ -74,10 +87,9 @@ const UserResolvers = {
 
 const UserQL = makeExecutableSchema({
     typeDefs: UserSchema,
-    resolvers: UserResolvers
+    resolvers: UserResolvers,
 });
 
-
 module.exports = {
-    UserQL
+    UserQL,
 };
