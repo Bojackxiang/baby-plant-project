@@ -1,8 +1,12 @@
 const { MongoDriver } = require("../../db/index");
 const { gql } = require("apollo-server");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
-const { getRedisValueByName } = require("../../redis/utils");
+const {
+    getRedisValueByName,
+    saveRedisUserByName,
+} = require("../../redis/utils");
 const generateUserWebTokenByAccount = require("../../utils/generaleUserWebToken");
+const RESPONSE_STATUS = require("../../constants/response");
 
 const UserSchema = gql`
     enum UserResponseType {
@@ -26,7 +30,6 @@ const UserSchema = gql`
     }
     union ResultType = TypeA | TypeB
 
-    # User type data
     type User {
         email: String
         password: String
@@ -38,6 +41,11 @@ const UserSchema = gql`
         password: String
     }
 
+    input UserRegisterInput {
+        username: String
+        password: String
+    }
+
     type Query {
         getUsers: [User]
         test: ResultType
@@ -45,7 +53,8 @@ const UserSchema = gql`
     }
 
     type Mutation {
-        userLogin(userInput: UserLoginInput): UserResponse
+        userLogin(input: UserLoginInput): UserResponse
+        userRegister(input: UserRegisterInput): UserResponse
     }
 `;
 
@@ -65,13 +74,21 @@ const UserResolvers = {
     },
 
     Mutation: {
-        userLogin: async (parent, { userInput: { username, password } }) => {
+        userLogin: async (parent, { input: { username, password } }) => {
             try {
+                // handle edge case
+                if (!username || !password)
+                    return {
+                        status: RESPONSE_STATUS.FAIL,
+                        message: "需要用户名和密码",
+                        code: -1,
+                    };
+
                 // 如果在 redis 里面能找到user
                 const foundUser = await getRedisValueByName(username);
                 if (foundUser)
                     return {
-                        status: "SUCCESS",
+                        status: RESPONSE_STATUS.SUCCESS,
                         message: "",
                         code: 1,
                     };
@@ -82,13 +99,28 @@ const UserResolvers = {
                     password
                 );
 
+                saveRedisUserByName(username, token);
+
                 return {
-                    status: "SUCCESS",
+                    status: RESPONSE_STATUS.SUCCESS,
                     message: token,
                     code: 1,
                 };
             } catch (error) {
                 console.log(error.message);
+            }
+        },
+
+        userRegister: async (parent, {input: {username, password}}) => {
+            console.log('username, password: ', username, password);
+            // 检查是否有重名
+
+            // 将数据放到数据库里面
+
+            return {
+                status: RESPONSE_STATUS.SUCCESS,
+                message: '',
+                code: 1, 
             }
         },
     },

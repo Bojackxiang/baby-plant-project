@@ -8,6 +8,15 @@ const getRedisValueByName = (valueName) => {
     });
 };
 
+const saveRedisUserByName = (name, token) => {
+    return new Promise((resolve, reject) => {
+        return redisClient.set(name, token, () =>{
+            resolve('success')
+        })
+    })
+}
+
 module.exports = {
     getRedisValueByName,
+    saveRedisUserByName
 };
